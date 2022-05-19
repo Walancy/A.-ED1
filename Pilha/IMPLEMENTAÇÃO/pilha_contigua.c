@@ -1,93 +1,23 @@
 #include "pilha.h"
 
-#define TAM_INICIAL 5
-
 ///////////////////// DADOS //////////////////////
+
+#define TAM_INICIAL 5 // tamanho do vetor
 
 struct pilha
 {
-    TipoElemento *vetor; // endereço do bloco do vetor
-
-    int tamVetor;      // tamanho do vetor
-    int qtdeElementos; // quantidade de elementos da pilha
+    TipoElemento *vetor;
+    int tamVetor;
+    int qtdeElementos;
 };
 
 ///////////////// IMPLEMENTAÇÃO //////////////////
-///////////// Desenvolva as funções //////////////
 
-/////////////////////////////////////// CRIAR PILHA
-//// - alocar espaço na memoria
-//// - declarar elementos da struct
+////////////// FUNÇÕES AUXILIARES ////////////////
 
-Pilha *pilha_criar()
+bool pilha_cheia(Pilha *p)
 {
-    Pilha *p = (Pilha *)malloc(sizeof(Pilha));
-
-    p->vetor = (int *)malloc(TAM_INICIAL * sizeof(int));
-    p->tamVetor = TAM_INICIAL;
-    p->qtdeElementos = 0; // quantidade inicial sempre 0
-
-    return p;
-}
-
-/////////////////////////////////////// DESTRUIR PILHA
-//// - acessar o endereço
-//// - apagar o endereço que contêm a pilha
-
-void pilha_destruir(Pilha **endereco)
-{
-    Pilha *b = *endereco; // cria uma variavel para acessar o endereço desejado
-
-    free(b->vetor);  // free no endereço do vetor
-    b->vetor = NULL; // deixa o espaço vazio
-
-    free(b); // apaga a variavel
-    b = NULL;
-}
-
-/////////////////////////////////////// EMPILHAR
-//// - Inserir o elemento
-//// - qtdeElementos ++
-
-bool pilha_empilhar(Pilha *p, TipoElemento elemento)
-{
-
-    p->vetor[p->qtdeElementos] = elemento;
-    p->qtdeElementos++;
-
-    return true;
-}
-
-/////////////////////////////////////// DESEMPILHAR
-//// -
-
-bool pilha_desempilhar(Pilha *p, TipoElemento *saida)
-{
-    for (int i = 0; i < p->qtdeElementos; i++)
-    {
-        if (i == p->qtdeElementos - 1)
-        {
-            *saida = p->vetor[i]; // posição a ser desempilhada
-            p->vetor[i] = NULL;   // limpa
-            p->qtdeElementos--;   // desempilha
-        }
-    }
-}
-
-///////////////////////////////////////IMPRIMIR O TOPO
-
-bool pilha_topo(Pilha *p, TipoElemento *saida)
-{
-    *saida = p->vetor[p->qtdeElementos - 1];
-
-    return true;
-}
-
-///////////////////////////////////////SABER SE A PILHA ESTÁ VAZIA
-
-bool pilha_vazia(Pilha *p)
-{
-    if (!p->vetor[0])
+    if (p->tamVetor == TAM_INICIAL)
     {
         return true;
     }
@@ -97,98 +27,119 @@ bool pilha_vazia(Pilha *p)
     }
 }
 
-///////////////////////////////////////IMPRIMIR A PILHA
-
-void pilha_imprimir(Pilha *p)
+bool pilha_vazia(Pilha *p)
 {
-
-    for (int i = 0; i < p->qtdeElementos; i++)
+    if (p->tamVetor == -1)
     {
-        printf("%i ", p->vetor[i]);
+        return true;
     }
-
-    printf("\n");
-}
-
-///////////////////////////////////////SABER O TAMANHO DA PILHA
-
-int pilha_tamanho(Pilha *p)
-{
-    return p->qtdeElementos;
-}
-
-///////////////////////////////////////CLONAR A PILHA
-
-Pilha *pilha_clone(Pilha *p)
-{
-    Pilha *aux;
-    aux = (Pilha *)malloc(sizeof(Pilha));
-    aux->vetor = (int *)malloc(p->tamVetor * sizeof(int));
-    aux->qtdeElementos = p->qtdeElementos;
-
-    for (int i = 0; i < p->qtdeElementos; i++)
-    {
-        aux->vetor[i] = p->vetor[i];
-    }
-
-    return aux;
-}
-
-///////////////////////////////////////INVERTER A PILHA
-
-void pilha_inverter(Pilha *p)
-{
-    Pilha *clone;
-
-    clone = pilha_clone(p);
-
-    int j = pilha_tamanho(p) - 1;
-
-    for (int i = 0; i < clone->qtdeElementos; i++)
-    {
-        p->vetor[i] = clone->vetor[j];
-
-        j--;
-    }
-}
-
-///////////////////////////////////////EMPILHAR
-
-bool pilha_empilharTodos(Pilha *p, TipoElemento *vetor, int tamVetor)
-{
-    for (int i = 0; i < tamVetor; i++)
-    {
-        pilha_empilhar(p, vetor[i]);
-    }
-}
-
-///////////////////////////////////////TRANSFORMAR A PILHA EM STRING
-
-bool pilha_toString(Pilha *f, char *str)
-{
-    if (f == NULL)
+    else
     {
         return false;
     }
+}
 
-    str[0] = '\0';
+/////////////////// FUNÇÕES //////////////////////
 
-    strcat(str, "["); // insere na string o valor passado
+Pilha *pilha_criar()
+{
+    Pilha *p = (Pilha *)malloc(sizeof(Pilha));
 
-    for (int i = 0; i < f->qtdeElementos; i++)
+    p->vetor = (int *)malloc(TAM_INICIAL * sizeof(int));
+    p->tamVetor = TAM_INICIAL;
+    p->qtdeElementos = 0;
+
+    return p;
+}
+
+void pilha_destruir(Pilha **endereco)
+{
+    Pilha *dell = *endereco;
+
+    free(dell->vetor);
+    dell->vetor = NULL;
+
+    free(dell);
+    dell = NULL;
+}
+
+bool pilha_empilhar(Pilha *p, TipoElemento elemento)
+{
+    if (pilha_cheia)
     {
-        char casting[50];
+        return false;
+    }
+    else
+    {
+        p->vetor[p->qtdeElementos] = elemento;
+        p->qtdeElementos++;
+        return true;
+    }
+    
+}
 
-        sprintf(casting, "%d", f->vetor[i]);
-        strcat(str, casting);
+bool pilha_desempilhar(Pilha *p, TipoElemento *saida)
+{
+    if (pilha_vazia)
+    {
+        return false;
+    }
+    else
+    {
+        
+    }
+    
 
-        if (i < (f->qtdeElementos) - 1)
-        {
-            strcat(str, ",");
-        }
+}
+bool pilha_topo(Pilha *p, TipoElemento *saida)
+{
+
+    if (p->vetor[p->qtdeElementos] == -1)
+    {
+        return true;
     }
 
-    strcat(str, "]\n");
-
-    return true;
+    return false;
 }
+bool pilha_vazia(Pilha *p)
+{
+    if (p->vetor[0])
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+void pilha_imprimir(Pilha *p)
+{
+    for (int i = 0; i < p->qtdeElementos; i++)
+    {
+        printf("%d \n", p->vetor[i]);
+    }
+}
+int pilha_tamanho(Pilha *p)
+{
+    p->qtdeElementos;
+
+    return p;
+}
+Pilha *pilha_clone(Pilha *p)
+{
+    Pilha *Clone = (Pilha *)malloc(sizeof(Pilha));
+    Clone->vetor = (int *)malloc(Clone->tamVetor * sizeof(int));
+    Clone->qtdeElementos = p->qtdeElementos;
+
+    for (int i = 0; i < p->qtdeElementos; i++)
+    {
+        Clone->vetor[i] = p->vetor[i];
+    }
+
+    return Clone;
+}
+void pilha_inverter(Pilha *p)
+{
+}
+bool pilha_empilharTodos(Pilha *p, TipoElemento *vetor, int tamVetor);
+bool pilha_toString(Pilha *f, char *str);
